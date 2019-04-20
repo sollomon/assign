@@ -1,16 +1,22 @@
 #include <stdio.h>
 #include <string.h>
 #include<stdlib.h>
-#include"list.c"
-#include"list.h"
 #include"bst.c"
+#include"bst.h"
+#include"list.h"
 
 
-//Array of store
-//Number of stores is not expected to grow higher than a couple dozens
-const char *stores[24] = {"one","two","three","four", "five", "six", "seven","eight","nine","ten","abc","def","ghi","jkl","mno","pqr","stu","vwx","yza","bcd","rfg","hij","klm"};
 
-struct list *root = NULL;
+//Loyalty programs are saved as list since they are an array and defined in list files
+
+//Customers are save as bst and defined in bst files 
+
+
+
+//Array of list
+//Number of list is not expected to grow higher than a couple dozens
+
+struct bst *root = NULL;
 //Function declaration
 void subscribe(void);
 void unsubscribe(void);
@@ -20,73 +26,39 @@ void printsubscribers(void);
 void printarr(void);
 int findstore(char *name);
 
-struct list *getcustomer(int *id){
-    struct list *new = searchcustomer(id);
 
-    if(new == NULL){
-        new->link = NULL;
-        new->id = (int)id;
-        if(root == NULL){
-            new = root;
-        }else{
-            struct list *p;
-            p = root;
-            while(p->link != NULL){
-                p=p->link;
-            }
-            p->link = new;
-        }
-    }
-    return new;
-}
-
-
-//return customer with id of parameter
-struct list *searchcustomer(int *id){
-    struct list *new = (struct list*)malloc(sizeof (struct list));
-    while(root != NULL){
-        if(&root->id == id){
-            return root;
-        }else{
-            return NULL;
-        }
-        root = root->link;
-    }
-    return new;
-}
-
-
-//print array of stores
+//print array of list
 void printarr()
 {
     for(int i = 0;i<24;i++)
     {
-        printf("%s-->\n",stores[i]);
+        printf("%s-->\n",list[i]);
     }
 }
 
-//return number of customers of store of given name
+//return number of customers of list of given name
 void subscribers(char *name){
     int i = 0;
     int ctr = 1;
-    struct list *temp = root;
-    while(temp->link != NULL){
-        while (temp->store->link != NULL){
-            if(strcmp(temp->store->name,name)==0){
+    struct bst *temp = root;
+    while(temp->right != NULL){
+        while (temp->list->link != NULL){
+            if(strcmp(temp->list->name,name)==0){
                 i++;
             }else
             {
                 ctr++;
 
             }
-            temp->store = temp->store->link;
+            temp->list = temp->list->link;
         }
-        temp = temp->link;
+        temp = temp->right;
     }
     printf("%d",i);
+    preorder(temp);
 }
 
-//Prompt customer for name odf store to return number of customers
+//Prompt customer for name odf list to return number of customers
 void printsubscribers(){
 
     char name[100];
@@ -96,7 +68,7 @@ void printsubscribers(){
 }
 
 
-//delete program from list of programs in customer structure
+//delete program from bst of programs in customer structure
 void unsubscribe(){
     int id;
     char name[100];
@@ -105,8 +77,8 @@ void unsubscribe(){
     printf("Enter name of program'\n");
     fgets(name,100, stdin);
 
-    struct list *cust = searchcustomer(id);
-      /* See if we are at end of list. */
+    struct bst *cust = searchcustomer(id);
+      /* See if we are at end of bst. */
   if (cust == NULL)
     return NULL;
 
@@ -114,11 +86,11 @@ void unsubscribe(){
    * Check to see if current node is one
    * to be deleted.
    */
-  if (cust->store->name == name) {
-    struct list  *tempNextP;
+  if (cust->list->name == name) {
+    struct bst  *tempNextP;
 
     /* Save the next pointer in the node. */
-    tempNextP = cust->store->link;
+    tempNextP = cust->list->link;
 
     /* Deallocate the node. */
     free(cust);
@@ -134,11 +106,11 @@ void unsubscribe(){
 
   /*
    * -------------- RECURSION-------------------
-   * Check the rest of the list, fixing the next
+   * Check the rest of the bst, fixing the next
    * pointer in case the next node is the one
    * removed.
    */
-  cust->store->link = ListDelete(cust->store->link, cust->store);
+  cust->list->link = ListDelete(cust->list->link, cust->list);
 
 
   /*
@@ -154,19 +126,19 @@ void printsubscriptions(){
     int id;
     printf("enter id\n");
     scanf("%d",id);
-    struct list *cust = searchcustomer(id);
+    struct bst *cust = searchcustomer(id);
     for(int i = 0;i<24; i++){
-        printf("$s-->\n",cust->store[i]);
+        printf("$s-->\n",cust->list[i]);
     }
 }
 
 //Creates  customer if ther is no customer
-//adds a store to the list of stores in customers structure
+//adds a list to the bst of list in customers structure
 void subscribe(){
-    struct list *new; 
-    struct store *first = (struct store*)malloc(sizeof(struct store));
+    struct bst *new; 
+    struct list *first = (struct list*)malloc(sizeof(struct list));
 
-    struct store *roots = NULL;
+    struct list *roots = NULL;
     int id;
     char name[100];
     printf("Enter your id:\n");
@@ -176,20 +148,20 @@ void subscribe(){
     fgets(name,100, stdin);
     int found  = findstore(name);
     if(found == 1){
-        new->store->link = NULL;
-        new->store->name = name;
+        new->list->link = NULL;
+        new->list->name = name;
         if(roots == NULL){
-            roots = new->store;
+            roots = new->list;
         }else{
-            struct list *p;
+            struct bst *p;
             p = roots;
-            while(p->link != NULL){
-                p=p->link;
+            while(p->right != NULL){
+                p=p->right;
             }
-            p->link = new;
+            p->right = new;
         }
     }else{
-        printf("Store not found enter 3 to see stores\n\n");
+        printf("Store not found enter 3 to see list\n\n");
     }
 
 }
